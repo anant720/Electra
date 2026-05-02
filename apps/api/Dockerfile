@@ -3,7 +3,9 @@
 
 # ─── Stage 1: Build ───
 FROM node:20-alpine AS builder
+RUN apk add --no-cache openssl
 WORKDIR /app
+
 
 # Copy workspace configuration
 COPY package*.json ./
@@ -31,7 +33,9 @@ RUN npm run build --workspace=@electra/api
 
 # ─── Stage 2: Production ───
 FROM node:20-alpine
+RUN apk add --no-cache openssl
 WORKDIR /app
+
 
 # 1. Copy workspace manifests (Required for local linking)
 COPY package*.json ./
