@@ -26,8 +26,8 @@ COPY . .
 RUN npx prisma generate
 
 # Build the specific workspace
-RUN npm run build --workspace=@electra/types
 RUN npm run build --workspace=@electra/api
+
 
 
 # ─── Stage 2: Production ───
@@ -44,8 +44,8 @@ RUN npm install --omit=dev --workspace=@electra/api
 
 # 3. Copy build artifacts and Prisma from builder
 COPY --from=builder /app/apps/api/dist ./apps/api/dist
-COPY --from=builder /app/packages/types/dist ./packages/types/dist
 COPY --from=builder /app/prisma ./prisma
+
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma/client ./node_modules/@prisma/client
 
