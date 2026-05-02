@@ -26,7 +26,9 @@ COPY . .
 RUN npx prisma generate
 
 # Build the specific workspace
+RUN npm run build --workspace=@electra/types
 RUN npm run build --workspace=@electra/api
+
 
 # ─── Stage 2: Production ───
 FROM node:20-alpine
