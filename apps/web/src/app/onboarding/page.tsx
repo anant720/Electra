@@ -662,8 +662,9 @@ function OnboardingContent() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
-            {STATES_BY_COUNTRY[selectedCountry]
+            {(STATES_BY_COUNTRY[selectedCountry] || [])
               .filter(s => s.toLowerCase().includes(searchQuery.toLowerCase()))
+
               .map((state) => (
                 <button
                   key={state}

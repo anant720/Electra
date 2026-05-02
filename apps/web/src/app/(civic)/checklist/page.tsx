@@ -30,7 +30,6 @@ export default function ChecklistPage() {
     };
   }, [checklist, checklistStates]);
 
-
   return (
     <ProtectedRoute>
       <main className="min-h-screen pb-20" style={{ background: '#F8FAFC' }}>
@@ -51,7 +50,7 @@ export default function ChecklistPage() {
               Your Voter Checklist
             </h1>
             <p className="text-xl text-white/60 font-medium max-w-2xl">
-              Personalized tasks for <strong className="text-white">{countryCode}</strong> 
+              Personalized tasks for <strong className="text-white">{countryCode || 'IND'}</strong> 
               {stateOrProvince && <span> • <strong className="text-white">{stateOrProvince}</strong></span>}.
             </p>
 
@@ -76,9 +75,7 @@ export default function ChecklistPage() {
           </div>
         </div>
 
-        {/* Content */}
         <div className="max-w-4xl mx-auto px-4 mt-20">
-          
           {/* Domain Filters */}
           <div className="flex gap-2 overflow-x-auto pb-4 no-scrollbar mb-8">
             {domains.map(d => (
@@ -144,30 +141,31 @@ export default function ChecklistPage() {
                           }`}>
                             {item.description || 'Verified civic task for your persona.'}
                           </p>
-                        
-                        {item.actionUrl && !isCompleted && (
-
-                          <div className="mt-4 flex items-center gap-4">
-                            <a 
-                              href={item.actionUrl} 
-                              target="_blank" 
-                              onClick={(e) => e.stopPropagation()}
-                              className="text-[10px] font-black text-[#0070F3] uppercase tracking-widest hover:underline"
-                            >
-                              Open Portal ↗
-                            </a>
-                            <Link 
-                              href={`/register/${countryCode}`} 
-                              onClick={(e) => e.stopPropagation()}
-                              className="text-[10px] font-black text-gray-400 uppercase tracking-widest hover:text-[#102A43] transition-colors"
-                            >
-                              View Forms
-                            </Link>
-                          </div>
-                        )}
+                          
+                          {item.actionUrl && !isCompleted && (
+                            <div className="mt-4 flex items-center gap-4">
+                              <a 
+                                href={item.actionUrl} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                onClick={(e) => e.stopPropagation()}
+                                className="text-[10px] font-black text-[#0070F3] uppercase tracking-widest hover:underline"
+                              >
+                                Open Portal ↗
+                              </a>
+                              <Link 
+                                href={`/register/${countryCode || 'IND'}`} 
+                                onClick={(e) => e.stopPropagation()}
+                                className="text-[10px] font-black text-gray-400 uppercase tracking-widest hover:text-[#102A43] transition-colors"
+                              >
+                                View Forms
+                              </Link>
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </section>
             ))}

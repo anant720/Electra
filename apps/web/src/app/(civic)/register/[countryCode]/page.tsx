@@ -4,7 +4,13 @@ import { useParams } from 'next/navigation';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 
 
-const COUNTRY_DETAILS: Record<string, { label: string; url: string; steps: string[] }> = {
+interface CountryDetail {
+  label: string;
+  url: string;
+  steps: string[];
+}
+
+const COUNTRY_DETAILS: Record<string, CountryDetail> = {
   IND: {
     label: 'National Voter Service Portal (India)',
     url: 'https://voters.eci.gov.in',
@@ -54,8 +60,11 @@ const COUNTRY_DETAILS: Record<string, { label: string; url: string; steps: strin
 
 export default function CountryRegisterPage() {
   const params = useParams();
-  const countryCode = (Array.isArray(params.countryCode) ? params.countryCode[0] : params.countryCode)?.toUpperCase() || 'IND';
-  const details = COUNTRY_DETAILS[countryCode] || COUNTRY_DETAILS.IND;
+  const rawCountry = Array.isArray(params.countryCode) ? params.countryCode[0] : params.countryCode;
+  const countryCode = rawCountry?.toUpperCase() || 'IND';
+  const details = (COUNTRY_DETAILS[countryCode] || COUNTRY_DETAILS.IND) as CountryDetail;
+
+
 
   return (
     <ProtectedRoute>
