@@ -4,7 +4,9 @@ export interface ChecklistItem {
   id: number;
   label: string;
   description?: string;
+  actionUrl?: string;
 }
+
 
 export interface ChecklistDomain {
   key: string;

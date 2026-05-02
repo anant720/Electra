@@ -145,7 +145,8 @@ export default function ChecklistPage() {
                             {item.description || 'Verified civic task for your persona.'}
                           </p>
                         
-                        {item.actionUrl && !checklistStates[item.id] && (
+                        {item.actionUrl && !isCompleted && (
+
                           <div className="mt-4 flex items-center gap-4">
                             <a 
                               href={item.actionUrl} 

@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { CountryCode, PersonaCode } from '@electra/types';
 
@@ -49,12 +50,12 @@ export const useCivicStore = create<CivicState>()(
           [itemId]: !state.checklistStates[itemId]
         }
       })),
-      reset: () => set({ 
-        countryCode: null, 
-        personaCode: null, 
-        stateOrProvince: null, 
-        completedRegistrationSteps: [], 
-        checklistStates: {} 
+      reset: () => set({
+        countryCode: null,
+        personaCode: null,
+        stateOrProvince: null,
+        completedRegistrationSteps: [],
+        checklistStates: {}
       }),
 
     }),
