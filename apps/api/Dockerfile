@@ -41,8 +41,8 @@ COPY packages/types/package*.json ./packages/types/
 COPY packages/types/src ./packages/types/src
 
 # 2. Install production dependencies
- for the whole workspace
 RUN npm install --omit=dev --workspace=@electra/api
+
 
 # 3. Copy build artifacts and Prisma from builder
 COPY --from=builder /app/apps/api/dist ./apps/api/dist
