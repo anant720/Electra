@@ -26,9 +26,8 @@ COPY . .
 RUN npx prisma generate
 
 # Build the specific workspace
+RUN npm run build --workspace=@electra/types
 RUN npm run build --workspace=@electra/api
-
-
 
 # ─── Stage 2: Production ───
 FROM node:20-alpine
@@ -38,18 +37,16 @@ WORKDIR /app
 COPY package*.json ./
 COPY apps/api/package*.json ./apps/api/
 COPY packages/types/package*.json ./packages/types/
-COPY packages/types/src ./packages/types/src
 
-# 2. Install production dependencies
-RUN npm install --omit=dev --workspace=@electra/api
-
-
-# 3. Copy build artifacts and Prisma from builder
+# 2. Copy build artifacts and Prisma from builder
 COPY --from=builder /app/apps/api/dist ./apps/api/dist
+COPY --from=builder /app/packages/types/dist ./packages/types/dist
 COPY --from=builder /app/prisma ./prisma
-
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma/client ./node_modules/@prisma/client
+
+# 3. Install production dependencies
+RUN npm install --omit=dev --workspace=@electra/api
 
 # Runtime Env
 ENV NODE_ENV=production
@@ -59,4 +56,5 @@ EXPOSE 3001
 
 # Run the app from its workspace location
 CMD ["node", "apps/api/dist/main"]
+
 
