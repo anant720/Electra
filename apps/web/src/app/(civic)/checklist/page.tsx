@@ -1,91 +1,196 @@
 'use client';
 
-import { useState } from 'react';
 import { useCivicStore } from '@/store/civicStore';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
+import { getChecklist } from '@/data/checklists';
+import { useState, useMemo } from 'react';
+import Link from 'next/link';
 
 export default function ChecklistPage() {
-  const { countryCode, completedRegistrationSteps, toggleRegistrationStep } = useCivicStore();
-  const country = countryCode ?? 'IND';
-  
-  const checklistItems = [
-    { id: 0, label: 'Confirm your eligibility to vote', domain: 'Registration' },
-    { id: 1, label: 'Complete voter registration form', domain: 'Registration' },
-    { id: 2, label: 'Verify your name on the electoral roll', domain: 'Registration' },
-    { id: 3, label: 'Locate your Voter ID or required documentation', domain: 'Documents' },
-    { id: 4, label: 'Identify alternative documents if ID is lost', domain: 'Documents' },
-    { id: 5, label: 'Find your assigned polling station', domain: 'Location' },
-    { id: 6, label: 'Save the official voter helpline number', domain: 'Emergency' },
-  ];
+  const { countryCode, personaCode, stateOrProvince, toggleChecklistItem, checklistStates } = useCivicStore();
+  const [activeDomain, setActiveDomain] = useState<string>('all');
 
-  const checkedSteps = new Set(completedRegistrationSteps);
-  const progress = Math.round((checkedSteps.size / checklistItems.length) * 100);
+  const checklist = useMemo(() => {
+    return getChecklist(countryCode || 'IND', personaCode || 'P01');
+  }, [countryCode, personaCode]);
+
+  const domains = ['all', ...checklist.domains.map(d => d.id)];
+  
+  const filteredDomains = activeDomain === 'all' 
+    ? checklist.domains 
+    : checklist.domains.filter(d => d.id === activeDomain);
+
+  const stats = useMemo(() => {
+    const allItems = checklist.domains.flatMap(d => d.items);
+    const completed = allItems.filter(item => checklistStates[item.id]).length;
+    return {
+      total: allItems.length,
+      completed,
+      percent: Math.round((completed / (allItems.length || 1)) * 100)
+    };
+  }, [checklist, checklistStates]);
 
   return (
     <ProtectedRoute>
-      <main className="min-h-screen px-4 py-12" style={{ background: '#F0F4F8' }}>
-      <div className="max-w-3xl mx-auto">
-        <div className="mb-8">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0070F3]/10 text-[#0070F3] text-xs font-semibold mb-3">
-            My Checklist
+      <main className="min-h-screen pb-20" style={{ background: '#F8FAFC' }}>
+        {/* Header */}
+        <div className="bg-[#102A43] text-white pt-16 pb-20 px-4 relative overflow-hidden">
+          <div className="max-w-4xl mx-auto relative z-10">
+            <div className="flex items-center gap-3 mb-6">
+              <Link href="/dashboard" className="text-white/50 hover:text-white text-sm font-bold transition-colors">
+                ← Dashboard
+              </Link>
+              <span className="text-white/20">•</span>
+              <span className="px-2.5 py-1 text-xs font-black uppercase tracking-wider rounded-md bg-white/10 text-white/80">
+                Civic Readiness
+              </span>
+            </div>
+            
+            <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
+              Your Voter Checklist
+            </h1>
+            <p className="text-xl text-white/60 font-medium max-w-2xl">
+              Personalized tasks for <strong className="text-white">{countryCode}</strong> 
+              {stateOrProvince && <span> • <strong className="text-white">{stateOrProvince}</strong></span>}.
+            </p>
+
+            {/* Progress Card */}
+            <div className="absolute -bottom-10 left-4 right-4 md:left-auto md:right-4 md:w-80 bg-white rounded-2xl p-6 shadow-xl border border-gray-100 flex items-center gap-5">
+              <div className="relative w-16 h-16 flex-shrink-0">
+                <svg className="w-full h-full transform -rotate-90">
+                  <circle cx="32" cy="32" r="28" fill="transparent" stroke="#F1F5F9" strokeWidth="8" />
+                  <circle cx="32" cy="32" r="28" fill="transparent" stroke="#0070F3" strokeWidth="8" 
+                    strokeDasharray={175.9} strokeDashoffset={175.9 - (175.9 * stats.percent / 100)}
+                    strokeLinecap="round" className="transition-all duration-1000" />
+                </svg>
+                <span className="absolute inset-0 flex items-center justify-center text-xs font-black text-[#102A43]">
+                  {stats.percent}%
+                </span>
+              </div>
+              <div>
+                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Readiness Score</p>
+                <p className="text-lg font-black text-[#102A43]">{stats.completed} of {stats.total} Tasks</p>
+              </div>
+            </div>
           </div>
-          <h1 className="text-3xl font-extrabold text-[#102A43] tracking-tight">
-            Voter Readiness Checklist
-          </h1>
-          <p className="text-[#52606D] mt-2">
-            Track your preparedness for the upcoming election in {country}.
-          </p>
         </div>
 
-        <div className="bg-white rounded-xl p-6 mb-6 shadow-sm border border-gray-100">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-sm font-bold text-[#102A43]">Overall Readiness</span>
-            <span className="text-sm font-bold" style={{ color: progress === 100 ? '#16A34A' : '#0070F3' }}>
-              {progress}% Ready
-            </span>
+        {/* Content */}
+        <div className="max-w-4xl mx-auto px-4 mt-20">
+          
+          {/* Domain Filters */}
+          <div className="flex gap-2 overflow-x-auto pb-4 no-scrollbar mb-8">
+            {domains.map(d => (
+              <button
+                key={d}
+                onClick={() => setActiveDomain(d)}
+                className={`px-5 py-2.5 rounded-xl font-bold text-sm whitespace-nowrap transition-all ${
+                  activeDomain === d 
+                    ? 'bg-[#102A43] text-white shadow-md' 
+                    : 'bg-white text-gray-500 border border-gray-200 hover:border-gray-300'
+                }`}
+              >
+                {d === 'all' ? 'All Steps' : d.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
+              </button>
+            ))}
           </div>
-          <div className="w-full h-3 bg-gray-100 rounded-full overflow-hidden">
-            <div
-              className="h-full rounded-full transition-all duration-500"
-              style={{ width: `${progress}%`, background: progress === 100 ? '#16A34A' : '#0070F3' }}
-            />
-          </div>
-        </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-          <div className="divide-y divide-gray-100">
-            {checklistItems.map((item) => {
-              const checked = checkedSteps.has(item.id);
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => toggleRegistrationStep(item.id)}
-                  aria-pressed={checked}
-                  className="flex items-center gap-4 w-full p-5 text-left transition-colors hover:bg-gray-50"
-                >
-                  <div className="flex-shrink-0 w-6 h-6 rounded border-2 flex items-center justify-center transition-colors"
-                    style={{ background: checked ? '#16A34A' : 'transparent', borderColor: checked ? '#16A34A' : '#CBD5E0' }}>
-                    {checked && (
-                      <svg width="12" height="10" viewBox="0 0 12 10" fill="none" aria-hidden="true">
-                        <path d="M1 5L4.5 8.5L11 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                    )}
+          {/* Checklist Sections */}
+          <div className="space-y-12">
+            {filteredDomains.map(domain => (
+              <section key={domain.id}>
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-xl shadow-sm">
+                    {domain.id === 'registration' ? '📝' : domain.id === 'verification' ? '🔍' : '🗳️'}
                   </div>
-                  <div className="flex-1">
-                    <p className={`text-base font-medium ${checked ? 'text-[#52606D] line-through' : 'text-[#102A43]'}`}>
-                      {item.label}
-                    </p>
-                    <p className="text-xs text-[#52606D] mt-1 font-semibold uppercase tracking-wider">
-                      {item.domain}
-                    </p>
+                  <div>
+                    <h2 className="text-xl font-black text-[#102A43]">{domain.title}</h2>
+                    <p className="text-sm text-gray-500 font-medium">{domain.items.length} Tasks</p>
                   </div>
-                </button>
-              );
-            })}
+                </div>
+
+                <div className="grid grid-cols-1 gap-4">
+                  {domain.items.map(item => (
+                    <div 
+                      key={item.id}
+                      onClick={() => toggleChecklistItem(item.id)}
+                      className={`group flex items-start gap-4 p-5 rounded-2xl border-2 transition-all cursor-pointer ${
+                        checklistStates[item.id] 
+                          ? 'bg-emerald-50/30 border-emerald-500/20' 
+                          : 'bg-white border-transparent hover:border-blue-500/20 shadow-sm'
+                      }`}
+                    >
+                      <div className={`mt-0.5 flex-shrink-0 w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${
+                        checklistStates[item.id]
+                          ? 'bg-emerald-500 border-emerald-500 text-white'
+                          : 'bg-white border-gray-200 group-hover:border-blue-400'
+                      }`}>
+                        {checklistStates[item.id] && <span className="text-[10px] font-black">✓</span>}
+                      </div>
+                      
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <h3 className={`font-bold text-sm transition-all ${
+                            checklistStates[item.id] ? 'text-emerald-900/60 line-through' : 'text-[#102A43]'
+                          }`}>
+                            {item.title}
+                          </h3>
+                          {item.priority === 'HIGH' && !checklistStates[item.id] && (
+                            <span className="px-1.5 py-0.5 rounded text-[8px] font-black bg-red-100 text-red-600 uppercase tracking-tighter">
+                              URGENT
+                            </span>
+                          )}
+                        </div>
+                        <p className={`text-xs leading-relaxed transition-all ${
+                          checklistStates[item.id] ? 'text-emerald-800/40' : 'text-gray-500'
+                        }`}>
+                          {item.description}
+                        </p>
+                        
+                        {item.actionUrl && !checklistStates[item.id] && (
+                          <div className="mt-4 flex items-center gap-4">
+                            <a 
+                              href={item.actionUrl} 
+                              target="_blank" 
+                              onClick={(e) => e.stopPropagation()}
+                              className="text-[10px] font-black text-[#0070F3] uppercase tracking-widest hover:underline"
+                            >
+                              Open Portal ↗
+                            </a>
+                            <Link 
+                              href={`/register/${countryCode}`} 
+                              onClick={(e) => e.stopPropagation()}
+                              className="text-[10px] font-black text-gray-400 uppercase tracking-widest hover:text-[#102A43] transition-colors"
+                            >
+                              View Forms
+                            </Link>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            ))}
+          </div>
+
+          {/* Footer Info */}
+          <div className="mt-20 p-8 rounded-3xl bg-[#102A43] text-white overflow-hidden relative">
+            <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+              <div>
+                <h3 className="text-xl font-black mb-2">Need direct help?</h3>
+                <p className="text-white/60 text-sm font-medium">Our AI can guide you through these steps in detail.</p>
+              </div>
+              <Link href="/ask" className="px-8 py-3 bg-white text-[#102A43] rounded-xl font-black hover:bg-gray-100 transition-colors shadow-lg">
+                Ask ELECTRA AI
+              </Link>
+            </div>
+            <div className="absolute top-0 right-0 opacity-10 pointer-events-none transform translate-x-1/4 -translate-y-1/4 text-9xl">
+              💬
+            </div>
           </div>
         </div>
-      </div>
-    </main>
+      </main>
     </ProtectedRoute>
   );
 }
