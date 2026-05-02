@@ -10,14 +10,17 @@ interface CivicState {
   subscribedElectionId: string | null;
   lastQueryIntent: string | null;
   completedRegistrationSteps: number[];
+  checklistStates: Record<string, boolean>;
 
   setCountry: (code: CountryCode) => void;
   setState: (state: string | null) => void;
   setPersona: (code: PersonaCode, confidence?: number) => void;
   setElection: (electionId: string) => void;
   toggleRegistrationStep: (stepIndex: number) => void;
+  toggleChecklistItem: (itemId: string) => void;
   reset: () => void;
 }
+
 
 export const useCivicStore = create<CivicState>()(
   persist(
@@ -29,8 +32,9 @@ export const useCivicStore = create<CivicState>()(
       subscribedElectionId: null,
       lastQueryIntent: null,
       completedRegistrationSteps: [],
+      checklistStates: {},
 
-      setCountry: (code) => set({ countryCode: code, completedRegistrationSteps: [] }),
+      setCountry: (code) => set({ countryCode: code, completedRegistrationSteps: [], checklistStates: {} }),
       setState: (state) => set({ stateOrProvince: state }),
       setPersona: (code, confidence = 1.0) => set({ personaCode: code, personaConfidence: confidence }),
       setElection: (id) => set({ subscribedElectionId: id }),
@@ -39,7 +43,20 @@ export const useCivicStore = create<CivicState>()(
         steps.has(stepIndex) ? steps.delete(stepIndex) : steps.add(stepIndex);
         return { completedRegistrationSteps: Array.from(steps) };
       }),
-      reset: () => set({ countryCode: null, personaCode: null, stateOrProvince: null, completedRegistrationSteps: [] }),
+      toggleChecklistItem: (itemId: string) => set((state) => ({
+        checklistStates: {
+          ...state.checklistStates,
+          [itemId]: !state.checklistStates[itemId]
+        }
+      })),
+      reset: () => set({ 
+        countryCode: null, 
+        personaCode: null, 
+        stateOrProvince: null, 
+        completedRegistrationSteps: [], 
+        checklistStates: {} 
+      }),
+
     }),
     {
       name: 'electra-civic-context',
