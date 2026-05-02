@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useCivicStore } from '@/store/civicStore';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 
-type Tab = 'ask' | 'myth' | 'jargon';
+type Tab = 'ask' | 'myth';
 
 export default function AskPage() {
   const { countryCode, personaCode } = useCivicStore();
@@ -34,8 +34,6 @@ export default function AskPage() {
     let finalQuery = query;
     if (activeTab === 'myth') {
       finalQuery = `[MYTH VERIFICATION REQUEST] I heard this rumor regarding elections in ${activeCountryName}: "${query}". Is this true or false based strictly on official records?`;
-    } else if (activeTab === 'jargon') {
-      finalQuery = `[JARGON DEFINITION] Define the civic term "${query}" strictly in the context of ${activeCountryName}'s electoral system, using simple language.`;
     }
 
     try {
@@ -91,7 +89,7 @@ export default function AskPage() {
           <div className="mb-10 text-center">
             <div className="inline-flex items-center justify-center mb-4">
               <img 
-                src="/electra-logo.png" 
+                src="/logo.png" 
                 alt="ELECTRA Logo" 
                 className="w-16 h-16 rounded-2xl shadow-lg border-2 border-white"
               />
@@ -118,12 +116,6 @@ export default function AskPage() {
             >
               🛡️ Myth Check
             </button>
-            <button 
-              onClick={() => { setActiveTab('jargon'); setResponse(null); }}
-              className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all ${activeTab === 'jargon' ? 'bg-[#102A43] text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'}`}
-            >
-              📖 Jargon
-            </button>
           </div>
 
           {/* Input Area */}
@@ -133,8 +125,7 @@ export default function AskPage() {
               onChange={(e) => setQuery(e.target.value)}
               placeholder={
                 activeTab === 'ask' ? `Ask a question about voting in ${activeCountryName}...` :
-                activeTab === 'myth' ? `Paste a rumor or claim about elections in ${activeCountryName} to verify it...` :
-                `Enter a confusing civic word used in ${activeCountryName}...`
+                `Paste a rumor or claim about elections in ${activeCountryName} to verify it...`
               }
               rows={4}
               className="w-full bg-white rounded-2xl p-5 pr-20 shadow-sm border border-gray-200 resize-none focus:outline-none focus:border-[#0070F3] focus:ring-4 focus:ring-[#0070F3]/10 transition-all text-[#102A43] text-lg font-medium"

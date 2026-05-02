@@ -23,6 +23,30 @@ Election data is high-stakes. A hallucinated date or a biased AI response can di
 
 ---
 
+## 🎯 Challenge 2 Evaluator Path
+
+For judges and reviewers, use the public route below first:
+
+- **Public Demo Route:** `/challenge2-demo`
+- **No sign-in required:** Demonstrates challenge-fit in one screen
+- **What to test in 90 seconds:**
+  1. Select country + persona
+  2. Click timeline stages to view plain-language explanations
+  3. Trigger emergency shortcut flow
+  4. Verify official source links for the selected country
+
+### Requirement-to-Feature Mapping
+
+| Challenge Requirement | ELECTRA Implementation |
+| :--- | :--- |
+| Election process education assistant | Interactive 11-stage lifecycle timeline in `/challenge2-demo` |
+| Interactive and easy-to-follow | Clickable stage cards + plain-language action guidance |
+| Region awareness | Country selector (`IND`, `USA`, `GBR`, `CAN`, `AUS`) |
+| User adaptation | Persona selector with context-adjusted explanation |
+| Trustworthy civic guidance | Official source block + neutrality/disclaimer constraints |
+
+---
+
 ## 🏗️ Agentic Architecture (The "Antigravity" Method)
 ELECTRA was built using a **Multi-Agent Orchestration** strategy within Google Antigravity, moving away from "Prompt Soup" and into modular system design:
 

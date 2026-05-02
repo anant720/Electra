@@ -15,12 +15,26 @@ const COUNTRY_META: Record<string, { name: string; flag: string }> = {
   AUS: { name: 'Australia',      flag: '🇦🇺' },
 };
 
-const NAV_LINKS = [
+// Public links always visible (no auth required)
+const PUBLIC_NAV_LINKS = [
+  { href: '/challenge2-demo', label: 'Election Guide' },
+  { href: '/timeline',        label: 'Timeline'       },
+  { href: '/jargon',          label: 'Jargon'         },
+];
+
+// Keep single ref for backward compat in mobile menu sections below
+const PUBLIC_NAV_LINK = PUBLIC_NAV_LINKS[0];
+
+// Auth-only links — only shown when signed in
+const AUTH_NAV_LINKS = [
   { href: '/dashboard',  label: 'Dashboard'    },
   { href: '/checklist',  label: 'Checklist'    },
   { href: '/elections',  label: 'Calendar'     },
   { href: '/ask',        label: 'Ask ELECTRA'  },
 ];
+
+// Combined for backwards compat (used in mobile menu)
+const NAV_LINKS = AUTH_NAV_LINKS;
 
 export function Navigation() {
   const pathname = usePathname();
@@ -112,7 +126,27 @@ export function Navigation() {
             role="navigation"
             aria-label="Main navigation"
           >
-            {NAV_LINKS.map(({ href, label }) => {
+            {/* Public links — always visible, no auth required */}
+            {PUBLIC_NAV_LINKS.map(({ href, label }) => {
+              const isActive = pathname === href || pathname?.startsWith(href);
+              return (
+                <Link
+                  key={href}
+                  href={href}
+                  className="px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-150"
+                  style={{
+                    color: isActive ? '#fff' : 'rgba(255,255,255,0.6)',
+                    background: isActive ? 'rgba(255,255,255,0.1)' : 'transparent',
+                    fontWeight: isActive ? 700 : 500,
+                  }}
+                  aria-current={isActive ? 'page' : undefined}
+                >
+                  {label}
+                </Link>
+              );
+            })}
+            {/* Auth-only nav links */}
+            {isAuthenticated && AUTH_NAV_LINKS.map(({ href, label }) => {
               const isActive = pathname === href || (href !== '/' && pathname?.startsWith(href));
               return (
                 <Link
@@ -189,7 +223,7 @@ export function Navigation() {
                   Sign in
                 </Link>
                 <Link
-                  href="/signup"
+                  href="/auth/signup"
                   className="hidden md:block px-4 py-2 rounded-xl text-xs font-bold text-white transition-all duration-150 hover:opacity-90"
                   style={{ background: 'linear-gradient(135deg, #0070F3, #7C3AED)' }}
                 >
@@ -254,7 +288,27 @@ export function Navigation() {
             aria-label="Mobile navigation"
           >
             <div className="px-4 py-4 flex flex-col gap-1">
-              {NAV_LINKS.map(({ href, label }) => {
+              {/* Public links — always visible in mobile menu */}
+              {PUBLIC_NAV_LINKS.map(({ href, label }) => {
+                const isActive = pathname === href || pathname?.startsWith(href);
+                return (
+                  <Link
+                    key={href}
+                    href={href}
+                    onClick={() => setMenuOpen(false)}
+                    className="px-4 py-3 rounded-xl text-sm font-medium transition-all duration-150"
+                    style={{
+                      color: isActive ? '#fff' : 'rgba(255,255,255,0.6)',
+                      background: isActive ? 'rgba(255,255,255,0.1)' : 'transparent',
+                    }}
+                    aria-current={isActive ? 'page' : undefined}
+                  >
+                    {label}
+                  </Link>
+                );
+              })}
+              {/* Auth-only links */}
+              {isAuthenticated && NAV_LINKS.map(({ href, label }) => {
                 const isActive = pathname === href || (href !== '/' && pathname?.startsWith(href));
                 return (
                   <Link
@@ -304,7 +358,7 @@ export function Navigation() {
                     Sign in
                   </Link>
                   <Link
-                    href="/signup"
+                    href="/auth/signup"
                     onClick={() => setMenuOpen(false)}
                     className="flex items-center justify-center py-3 rounded-xl text-sm font-bold text-white"
                     style={{ background: 'linear-gradient(135deg, #0070F3, #7C3AED)' }}

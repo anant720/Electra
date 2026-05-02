@@ -38,7 +38,7 @@ export default function NotFound() {
               className="absolute inset-0 bg-[#0070F3] blur-xl rounded-full"
             ></motion.div>
             <img 
-              src="/electra-logo.png" 
+              src="/logo.png" 
               alt="ELECTRA Logo" 
               className="w-24 h-24 rounded-2xl shadow-2xl border-2 border-white/20 relative z-10"
             />

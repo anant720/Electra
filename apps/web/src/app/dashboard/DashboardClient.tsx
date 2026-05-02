@@ -261,6 +261,8 @@ export default function DashboardClient() {
                 { href: '/emergency', icon: '🔴', label: 'Emergency' },
                 { href: '/simulate',  icon: '🗳️', label: 'Simulate' },
                 { href: '/ask',       icon: '🤖', label: 'Ask AI' },
+                { href: '/timeline',  icon: '🗓️', label: 'Timeline' },
+                { href: '/jargon',    icon: '📖', label: 'Jargon' },
               ].map(item => (
                 <Link
                   key={item.href}
@@ -479,6 +481,8 @@ export default function DashboardClient() {
               { href: '/emergency', icon: '🔴', label: 'Emergency Help'   },
               { href: '/simulate',  icon: '🗳️', label: 'Simulate Vote'    },
               { href: '/ask',       icon: '🤖', label: 'Ask ELECTRA'      },
+              { href: '/timeline',  icon: '🗓️', label: 'Full Timeline'    },
+              { href: '/jargon',    icon: '📖', label: 'Jargon Buster'    },
             ].map(item => (
               <Link
                 key={item.href}

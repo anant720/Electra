@@ -8,9 +8,7 @@
   "theme_color": "#102A43",
   "orientation": "portrait-primary",
   "icons": [
-    { "src": "/pwa_192.png",           "sizes": "192x192", "type": "image/png" },
-    { "src": "/pwa_512.png",           "sizes": "512x512", "type": "image/png" },
-    { "src": "/pwa_512_maskable.png",  "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    { "src": "/logo.svg", "sizes": "any", "type": "image/svg+xml" }
   ],
   "shortcuts": [
     {

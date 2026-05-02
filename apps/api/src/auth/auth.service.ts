@@ -14,6 +14,8 @@ import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { AuthTokens, JwtPayload, UserRole } from '@electra/types';
 import { AuditService } from '../admin/audit.service';
+import { createHash } from 'crypto';
+
 
 @Injectable()
 export class AuthService {
@@ -103,7 +105,8 @@ export class AuthService {
 
   // ─── Refresh Token ────────────────────────────────────────────────────────
   async refresh(refreshToken: string): Promise<AuthTokens> {
-    const tokenHash = require('crypto').createHash('sha256').update(refreshToken).digest('hex');
+    const tokenHash = createHash('sha256').update(refreshToken).digest('hex');
+
     const session = await this.prisma.session.findUnique({ where: { tokenHash } });
     if (!session || session.revokedAt || session.expiresAt < new Date()) {
       if (session) await this.prisma.session.update({ where: { id: session.id }, data: { revokedAt: new Date() } });
@@ -120,7 +123,8 @@ export class AuthService {
 
   // ─── Logout ───────────────────────────────────────────────────────────────
   async logout(refreshToken: string): Promise<void> {
-    const tokenHash = require('crypto').createHash('sha256').update(refreshToken).digest('hex');
+    const tokenHash = createHash('sha256').update(refreshToken).digest('hex');
+
     await this.prisma.session.updateMany({ where: { tokenHash }, data: { revokedAt: new Date() } });
   }
 
@@ -141,7 +145,8 @@ export class AuthService {
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 7);
 
-    const tokenHash = require('crypto').createHash('sha256').update(refreshTokenValue).digest('hex');
+    const tokenHash = createHash('sha256').update(refreshTokenValue).digest('hex');
+
 
     await this.prisma.session.create({
       data: { userId, tokenHash, expiresAt },

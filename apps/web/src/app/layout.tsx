@@ -25,24 +25,24 @@ export const metadata: Metadata = {
     description: 'Verified civic intelligence for every voter, every election.',
     url: 'https://electra.app',
     siteName: 'ELECTRA',
-    images: [{ url: '/og-image.png', width: 1200, height: 630 }],
+    images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'ELECTRA — Navigate Every Election.',
     description: 'Verified civic intelligence for every voter, every election.',
-    images: ['/twitter-card.png'],
+    images: ['/twitter-card.svg'],
   },
   robots: { index: true, follow: true },
   manifest: '/manifest.json',
   icons: {
     icon: [
-      { url: '/favicon.png', sizes: '32x32', type: 'image/png' },
-      { url: '/favicon.png', sizes: '16x16', type: 'image/png' },
+      { url: '/favicon_180.png', sizes: '32x32', type: 'image/png' },
+      { url: '/favicon_180.png', sizes: '16x16', type: 'image/png' },
     ],
-    apple: '/favicon.png',
-    shortcut: '/favicon.png',
+    apple: '/favicon_180.png',
+    shortcut: '/favicon_180.png',
   },
 };
 

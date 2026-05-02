@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 
 export default function SignUpPage() {
+  const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
   const router = useRouter();
   const { isAuthenticated, onboardingComplete } = useAuthStore();
   const [email, setEmail] = useState('');
@@ -26,7 +27,7 @@ export default function SignUpPage() {
     setError('');
     setLoading(true);
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/register`, {
+      const res = await fetch(`${apiBase}/api/v1/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -76,7 +77,7 @@ export default function SignUpPage() {
 
           {/* Google OAuth */}
           <a
-            href={`${process.env.NEXT_PUBLIC_API_URL}/auth/google`}
+            href={`${apiBase}/api/v1/auth/google`}
 
             className="flex items-center justify-center gap-3 w-full py-3 px-4 rounded-xl border text-white text-sm font-semibold transition-all duration-150 hover:bg-white/5 mb-6"
             style={{ border: '1px solid rgba(255,255,255,0.15)' }}
