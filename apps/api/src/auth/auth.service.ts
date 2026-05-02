@@ -160,7 +160,7 @@ export class AuthService {
       await this.prisma.session.create({
         data: { userId, tokenHash, expiresAt },
       });
-    } catch (e) {
+    } catch (e: any) {
       this.logger.error(`Failed to create session in database: ${e.message}`, e.stack);
       throw e;
     }

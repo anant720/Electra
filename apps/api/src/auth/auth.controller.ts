@@ -1,5 +1,5 @@
 import {
-  Controller, Post, Body, Get, UseGuards, Req, Res, HttpCode, HttpStatus,
+  Controller, Post, Body, Get, UseGuards, Req, Res, HttpCode, HttpStatus, Logger,
 } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
@@ -13,6 +13,7 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
+  private readonly logger = new Logger(AuthController.name);
   constructor(private readonly auth: AuthService) {}
 
   @Post('register')
@@ -47,7 +48,7 @@ export class AuthController {
       // Redirect to web app /auth/callback with tokens — that page stores them and goes to /dashboard
       const frontendUrl = process.env['FRONTEND_URL'] ?? 'http://localhost:3000';
       res.redirect(`${frontendUrl}/auth/callback?accessToken=${tokens.accessToken}&refreshToken=${tokens.refreshToken}`);
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Google OAuth callback failed: ${error.message}`, error.stack);
       const frontendUrl = process.env['FRONTEND_URL'] ?? 'http://localhost:3000';
       res.redirect(`${frontendUrl}/auth/login?error=oauth_failed`);
