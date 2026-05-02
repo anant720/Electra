@@ -32,12 +32,17 @@ RUN npm run build --workspace=@electra/api
 FROM node:20-alpine
 WORKDIR /app
 
-# Only copy what's needed for runtime
-COPY apps/api/package*.json ./
-RUN npm install --omit=dev
+# 1. Copy workspace manifests (Required for local linking)
+COPY package*.json ./
+COPY apps/api/package*.json ./apps/api/
+COPY packages/types/package*.json ./packages/types/
 
-# Copy build artifacts and Prisma from builder
-COPY --from=builder /app/apps/api/dist ./dist
+# 2. Install production dependencies for the whole workspace
+RUN npm install --omit=dev --workspace=@electra/api
+
+# 3. Copy build artifacts and Prisma from builder
+COPY --from=builder /app/apps/api/dist ./apps/api/dist
+COPY --from=builder /app/packages/types/dist ./packages/types/dist
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma/client ./node_modules/@prisma/client
@@ -48,5 +53,6 @@ ENV PORT=3001
 
 EXPOSE 3001
 
-# Run the app
-CMD ["node", "dist/main"]
+# Run the app from its workspace location
+CMD ["node", "apps/api/dist/main"]
+
