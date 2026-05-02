@@ -1,97 +1,68 @@
-# ELECTRA
-### Global Election Intelligence & Civic Navigation Platform
+# ⚡ ELECTRA — Civic Operating System
+### Interactive Election Intelligence & Deterministic Voter Navigation
 
-> *"Transforming the complexity of democracy into accessible, trustworthy civic guidance."*
-
----
-
-## What is ELECTRA?
-
-**ELECTRA** (Electoral Learning and Education Civic Tracking Assistant) is an AI-powered civic guidance platform that helps users understand, prepare for, and navigate elections through region-aware, interactive, and trustworthy guidance.
-
-ELECTRA is not a chatbot. It is a **Deterministic Civic Journey Platform** — converting the world's most fragmented election systems into structured, persona-specific action pathways.
-
-Built for the **Virtual Prompt War Challenge 2** — Google for Developers × Hack2Skill.
+> **Challenge 2 Entry:** Virtual Prompt War 2026 (Google for Developers × Hack2Skill)
+> **Platform:** Engineered exclusively using **Google Antigravity** (Gemini 3 Pro)
 
 ---
 
-## Repository Structure
+## 🌐 The Vision
+**ELECTRA** (Electoral Learning and Education Civic Tracking Assistant) is a next-generation civic guidance platform. While median solutions rely on generic chatbots, ELECTRA implements a **Deterministic Civic Journey** architecture—converting fragmented, high-stakes election procedures into structured, persona-aware action pathways.
 
-```
-ELECTRA/
-│
-├── docs/
-│   ├── product_overview.md        ← Vision, mission, personas, scope, MVP definition
-│   ├── mvp_scope.md               ← 5 countries, 4 personas, 10 features, explicit non-goals
-│   └── knowledge_dictionary.md    ← Standardized terminology for all development work
-│
-├── research/
-│   └── research_index.md          ← All research classified by category + build use
-│
-├── architecture/
-│   ├── system_domains.md          ← 5 system modules with responsibilities and interfaces
-│   └── data_hierarchy.md          ← 14-level data hierarchy with JSON schema examples
-│
-├── planning/
-│   ├── feature_matrix.md          ← 3-tier feature priority matrix (P1/P2/P3)
-│   └── tech_stack.md              ← Full technology decision log
-│
-├── database/                      ← Static JSON civic data files (built during development)
-├── prompts/                       ← Modular prompt files for AI agent orchestration
-├── frontend/                      ← Next.js + Tailwind CSS application
-└── submission/                    ← Blog post, LinkedIn copy, Antigravity artifacts
-```
+### 🛡️ The Problem: Civic Hallucination
+Election data is high-stakes. A hallucinated date or a biased AI response can disenfranchise a voter. ELECTRA solves this by stripping the LLM of its "fact-generation" role and restricting it to an **interpretive layer** over verified, static Civic Axiom data structures.
 
 ---
 
-## Foundation Architecture Stage — Deliverables
-
-| Document | Status |
-|---|---|
-| `/docs/product_overview.md` | ✅ Complete |
-| `/research/research_index.md` | ✅ Complete |
-| `/docs/knowledge_dictionary.md` | ✅ Complete |
-| `/architecture/system_domains.md` | ✅ Complete |
-| `/architecture/data_hierarchy.md` | ✅ Complete |
-| `/docs/mvp_scope.md` | ✅ Complete |
-| `/planning/feature_matrix.md` | ✅ Complete |
-| `/planning/tech_stack.md` | ✅ Complete |
+## ✨ Key Features
+- **⏳ Dynamic Election Timelines:** Visual, interactive roadmaps of the 11-stage electoral lifecycle (Notification to Counting).
+- **👤 Persona-Adaptive Guidance:** Custom workflows for first-time voters, overseas citizens, and students away from home.
+- **🛡️ Hallucination-Free Logic:** Emulated Retrieval-Augmented Generation (RAG) ensures every civic fact is anchored to a deterministic JSON schema.
+- **📚 Jargon-Buster Engine:** Clickable civic terminology (e.g., "Electoral Roll", "Form 6") with simplified, localized analogies.
+- **✅ Voter Readiness Score:** A real-time checklist tracking user preparedness across registration, ID verification, and polling knowledge.
 
 ---
 
-## 5 MVP Countries
+## 🏗️ Agentic Architecture (The "Antigravity" Method)
+ELECTRA was built using a **Multi-Agent Orchestration** strategy within Google Antigravity, moving away from "Prompt Soup" and into modular system design:
 
-🇮🇳 India · 🇺🇸 USA · 🇬🇧 UK · 🇨🇦 Canada · 🇦🇺 Australia
-
-## 4 MVP Personas
-
-First-Time Voter · Student Away From Home · Lost Voter ID · Registration Confusion
-
-## Core System Modules
-
-1. **Civic Intelligence Engine** — Electoral data, country schemas, timelines, verified sources
-2. **User Guidance Engine** — Personas, scenarios, action pathways, checklists
-3. **Trust & Safety Engine** — RAG constraints, neutrality, citation engine, hallucination prevention
-4. **UX Interaction Engine** — Progressive disclosure, timeline tracker, Voter Readiness Score
-5. **Submission & Demonstration Layer** — Challenge optimization, prompt architecture, narrative
+| Agent | Designation | Core Responsibility |
+| :--- | :--- | :--- |
+| **Α (Alpha)** | UI/UX Architect | React/Next.js components & WCAG 2.1 AA Accessibility. |
+| **Β (Beta)** | Data Modeler | Deterministic JSON schema construction for 20+ countries. |
+| **Γ (Gamma)** | Logic Engine | State management, progress tracking, and routing logic. |
+| **Δ (Delta)** | QA Automator | Autonomous browser testing via Antigravity Browser Agent. |
 
 ---
 
-## Tech Stack
-
-| Layer | Technology |
-|---|---|
-| IDE | Google Antigravity (Gemini 3 Pro) |
-| Frontend | React + Next.js + Tailwind CSS |
-| Data | Static JSON (Civic Axiom Data Structure) |
-| Deployment | Vercel |
-| Prompts | Modular markdown files in `/prompts/` |
-
----
-
-> **Internal Note:** This stage is formally titled "Foundation Architecture" or "Core Systems Initialization."
-> Never referred to as "Phase 0" in any documentation, code, or communication.
+## 🛠️ Technology Stack
+| Layer | Technology | Strategic Choice |
+| :--- | :--- | :--- |
+| **IDE** | **Google Antigravity** | Agentic mission control & artifact generation. |
+| **Frontend** | **Next.js 14 (App Router)** | Deployed on **Vercel** for edge performance. |
+| **Backend** | **NestJS (TypeScript)** | Deployed on **Render** (Dockerized) for reliability. |
+| **Database** | **PostgreSQL (Supabase)** | Relational integrity for complex jurisdiction data. |
+| **Cache** | **Redis (Upstash)** | Sub-millisecond rate limiting & state persistence. |
+| **Styling** | **Tailwind CSS** | Premium aesthetics with strict design tokens. |
 
 ---
 
-*Built with Google Antigravity · Virtual Prompt War 2026 · India*
+## 📂 Repository Roadmap
+- `apps/web`: The Next.js frontend application.
+- `apps/api`: The NestJS backend intelligence layer.
+- `packages/types`: Shared TypeScript definitions across the monorepo.
+- `prisma/`: Database schema and migration history.
+- `research/`: Competitive intelligence and global election matrix.
+- `docs/`: Product blueprints and "Civic Axiom" definitions.
+
+---
+
+## 🚦 Getting Started
+1. **Clone the Repo:** `git clone https://github.com/anant720/Electra.git`
+2. **Install Deps:** `npm install`
+3. **Run Dev Environment:** `npx turbo run dev`
+4. **Environment:** Copy `.env.example` to `.env` and add your `GEMINI_API_KEY`.
+
+---
+
+*Built with absolute neutrality for the 2026 Virtual Prompt War. This platform does not predict outcomes or provide political opinions—it empowers the voter.*
