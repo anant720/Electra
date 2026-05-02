@@ -1,9 +1,8 @@
 'use client';
 
 import { useParams } from 'next/navigation';
-import { useCivicStore } from '@/store/civicStore';
-import type { CountryCode } from '@electra/types';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
+
 
 const COUNTRY_DETAILS: Record<string, { label: string; url: string; steps: string[] }> = {
   IND: {
@@ -55,7 +54,7 @@ const COUNTRY_DETAILS: Record<string, { label: string; url: string; steps: strin
 
 export default function CountryRegisterPage() {
   const params = useParams();
-  const countryCode = (params.countryCode as string)?.toUpperCase() || 'IND';
+  const countryCode = (Array.isArray(params.countryCode) ? params.countryCode[0] : params.countryCode)?.toUpperCase() || 'IND';
   const details = COUNTRY_DETAILS[countryCode] || COUNTRY_DETAILS.IND;
 
   return (
@@ -80,10 +79,12 @@ export default function CountryRegisterPage() {
             <a 
               href={details.url} 
               target="_blank" 
+              rel="noopener noreferrer"
               className="block w-full py-4 bg-[#0070F3] text-white text-center rounded-2xl font-black shadow-lg shadow-blue-500/20 hover:bg-blue-600 transition-all"
             >
               Open {details.label} ↗
             </a>
+
           </div>
         </div>
       </main>
