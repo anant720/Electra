@@ -14,21 +14,22 @@ export default function ChecklistPage() {
     return getChecklist(countryCode || 'IND', personaCode || 'P01');
   }, [countryCode, personaCode]);
 
-  const domains = ['all', ...checklist.domains.map(d => d.id)];
+  const domains = ['all', ...checklist.map(d => d.key)];
   
   const filteredDomains = activeDomain === 'all' 
-    ? checklist.domains 
-    : checklist.domains.filter(d => d.id === activeDomain);
+    ? checklist 
+    : checklist.filter(d => d.key === activeDomain);
 
   const stats = useMemo(() => {
-    const allItems = checklist.domains.flatMap(d => d.items);
-    const completed = allItems.filter(item => checklistStates[item.id]).length;
+    const allItems = checklist.flatMap(d => d.items);
+    const completed = allItems.filter(item => checklistStates[String(item.id)]).length;
     return {
       total: allItems.length,
       completed,
       percent: Math.round((completed / (allItems.length || 1)) * 100)
     };
   }, [checklist, checklistStates]);
+
 
   return (
     <ProtectedRoute>
@@ -95,57 +96,54 @@ export default function ChecklistPage() {
             ))}
           </div>
 
-          {/* Checklist Sections */}
           <div className="space-y-12">
             {filteredDomains.map(domain => (
-              <section key={domain.id}>
+              <section key={domain.key}>
                 <div className="flex items-center gap-3 mb-6">
                   <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-xl shadow-sm">
-                    {domain.id === 'registration' ? '📝' : domain.id === 'verification' ? '🔍' : '🗳️'}
+                    {domain.icon || '🗳️'}
                   </div>
                   <div>
-                    <h2 className="text-xl font-black text-[#102A43]">{domain.title}</h2>
+                    <h2 className="text-xl font-black text-[#102A43]">{domain.label}</h2>
                     <p className="text-sm text-gray-500 font-medium">{domain.items.length} Tasks</p>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 gap-4">
-                  {domain.items.map(item => (
-                    <div 
-                      key={item.id}
-                      onClick={() => toggleChecklistItem(item.id)}
-                      className={`group flex items-start gap-4 p-5 rounded-2xl border-2 transition-all cursor-pointer ${
-                        checklistStates[item.id] 
-                          ? 'bg-emerald-50/30 border-emerald-500/20' 
-                          : 'bg-white border-transparent hover:border-blue-500/20 shadow-sm'
-                      }`}
-                    >
-                      <div className={`mt-0.5 flex-shrink-0 w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${
-                        checklistStates[item.id]
-                          ? 'bg-emerald-500 border-emerald-500 text-white'
-                          : 'bg-white border-gray-200 group-hover:border-blue-400'
-                      }`}>
-                        {checklistStates[item.id] && <span className="text-[10px] font-black">✓</span>}
-                      </div>
-                      
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <h3 className={`font-bold text-sm transition-all ${
-                            checklistStates[item.id] ? 'text-emerald-900/60 line-through' : 'text-[#102A43]'
-                          }`}>
-                            {item.title}
-                          </h3>
-                          {item.priority === 'HIGH' && !checklistStates[item.id] && (
-                            <span className="px-1.5 py-0.5 rounded text-[8px] font-black bg-red-100 text-red-600 uppercase tracking-tighter">
-                              URGENT
-                            </span>
-                          )}
-                        </div>
-                        <p className={`text-xs leading-relaxed transition-all ${
-                          checklistStates[item.id] ? 'text-emerald-800/40' : 'text-gray-500'
+                  {domain.items.map(item => {
+                    const itemId = String(item.id);
+                    const isCompleted = checklistStates[itemId];
+                    return (
+                      <div 
+                        key={itemId}
+                        onClick={() => toggleChecklistItem(itemId)}
+                        className={`group flex items-start gap-4 p-5 rounded-2xl border-2 transition-all cursor-pointer ${
+                          isCompleted 
+                            ? 'bg-emerald-50/30 border-emerald-500/20' 
+                            : 'bg-white border-transparent hover:border-blue-500/20 shadow-sm'
+                        }`}
+                      >
+                        <div className={`mt-0.5 flex-shrink-0 w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${
+                          isCompleted
+                            ? 'bg-emerald-500 border-emerald-500 text-white'
+                            : 'bg-white border-gray-200 group-hover:border-blue-400'
                         }`}>
-                          {item.description}
-                        </p>
+                          {isCompleted && <span className="text-[10px] font-black">✓</span>}
+                        </div>
+                        
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className={`font-bold text-sm transition-all ${
+                              isCompleted ? 'text-emerald-900/60 line-through' : 'text-[#102A43]'
+                            }`}>
+                              {item.label}
+                            </h3>
+                          </div>
+                          <p className={`text-xs leading-relaxed transition-all ${
+                            isCompleted ? 'text-emerald-800/40' : 'text-gray-500'
+                          }`}>
+                            {item.description || 'Verified civic task for your persona.'}
+                          </p>
                         
                         {item.actionUrl && !checklistStates[item.id] && (
                           <div className="mt-4 flex items-center gap-4">
