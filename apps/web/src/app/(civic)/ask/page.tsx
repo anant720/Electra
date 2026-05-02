@@ -38,7 +38,8 @@ export default function AskPage() {
 
     try {
       const { accessToken } = (await import('@/store/authStore')).useAuthStore.getState();
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/api/v1/ai/query`, {
+      const apiBase = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001').replace(/\/api\/v1\/?$/, '');
+      const res = await fetch(`${apiBase}/api/v1/ai/query`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 
 export default function LoginPage() {
-  const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+  const apiBase = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001').replace(/\/api\/v1\/?$/, '');
   const router = useRouter();
   const { isAuthenticated, onboardingComplete } = useAuthStore();
   const [email, setEmail] = useState('');

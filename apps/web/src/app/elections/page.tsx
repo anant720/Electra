@@ -13,7 +13,8 @@ export default function ElectionsPage() {
   useEffect(() => {
     async function fetchElections() {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/api/v1/countries/${countryCode || 'IND'}`);
+        const apiBase = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001').replace(/\/api\/v1\/?$/, '');
+        const res = await fetch(`${apiBase}/api/v1/countries/${countryCode || 'IND'}`);
         const data = await res.json();
         setEvents(data.jurisdictions?.[0]?.electionEvents || []);
       } catch (err) {

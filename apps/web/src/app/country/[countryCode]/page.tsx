@@ -19,7 +19,8 @@ export default function CountryIntelligencePage({ params }: { params: { countryC
   useEffect(() => {
     async function fetchCountryData() {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/api/v1/countries/${targetCountry}`);
+        const apiBase = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001').replace(/\/api\/v1\/?$/, '');
+        const res = await fetch(`${apiBase}/api/v1/countries/${targetCountry}`);
         if (!res.ok) throw new Error('Not found');
         const json = await res.json();
         setData(json);
