@@ -1,4 +1,5 @@
-import { CountryCode, PersonaCode } from '@electra/types';
+import type { CountryCode, PersonaCode } from '@electra/types';
+
 
 export interface ChecklistItem {
   id: number;

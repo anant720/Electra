@@ -1,7 +1,8 @@
 import { create } from 'zustand';
 
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { CountryCode, PersonaCode } from '@electra/types';
+import type { CountryCode, PersonaCode } from '@electra/types';
+
 
 interface CivicState {
   countryCode: CountryCode | null;
