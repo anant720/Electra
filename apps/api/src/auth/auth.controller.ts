@@ -42,10 +42,16 @@ export class AuthController {
   @UseGuards(AuthGuard('google'))
   @ApiOperation({ summary: 'Google OAuth callback' })
   async googleCallback(@Req() req: any, @Res() res: any) {
-    const tokens = await this.auth.googleLogin(req.user);
-    // Redirect to web app /auth/callback with tokens — that page stores them and goes to /dashboard
-    const frontendUrl = process.env['FRONTEND_URL'] ?? 'http://localhost:3000';
-    res.redirect(`${frontendUrl}/auth/callback?accessToken=${tokens.accessToken}&refreshToken=${tokens.refreshToken}`);
+    try {
+      const tokens = await this.auth.googleLogin(req.user);
+      // Redirect to web app /auth/callback with tokens — that page stores them and goes to /dashboard
+      const frontendUrl = process.env['FRONTEND_URL'] ?? 'http://localhost:3000';
+      res.redirect(`${frontendUrl}/auth/callback?accessToken=${tokens.accessToken}&refreshToken=${tokens.refreshToken}`);
+    } catch (error) {
+      this.logger.error(`Google OAuth callback failed: ${error.message}`, error.stack);
+      const frontendUrl = process.env['FRONTEND_URL'] ?? 'http://localhost:3000';
+      res.redirect(`${frontendUrl}/auth/login?error=oauth_failed`);
+    }
   }
 
   @Post('refresh')

@@ -66,13 +66,18 @@ export class AuthService {
 
   // ─── Google OAuth callback ────────────────────────────────────────────────
   async googleLogin(googleUser: { googleId: string; email: string; name?: string; avatar?: string }): Promise<AuthTokens> {
+    this.logger.log(`Attempting Google Login for email: ${googleUser.email}`);
+    
     let user = await this.prisma.user.findFirst({
       where: { oauthProvider: 'google', oauthId: googleUser.googleId },
     });
 
     if (!user) {
+      this.logger.log(`No user found with googleId: ${googleUser.googleId}, checking email: ${googleUser.email}`);
       user = await this.prisma.user.findUnique({ where: { email: googleUser.email } });
+      
       if (user) {
+        this.logger.log(`Found existing user with email: ${googleUser.email}, linking Google account.`);
         user = await this.prisma.user.update({
           where: { id: user.id },
           data: { 
@@ -85,6 +90,7 @@ export class AuthService {
           },
         });
       } else {
+        this.logger.log(`Creating new user for Google login: ${googleUser.email}`);
         user = await this.prisma.user.create({
           data: {
             email: googleUser.email,
@@ -99,6 +105,7 @@ export class AuthService {
       }
     }
 
+    this.logger.log(`User resolved: ${user.id}, issuing tokens...`);
     await this.audit.log(user.id, user.role, 'USER_GOOGLE_LOGIN', 'User', user.id);
     return this.issueTokens(user.id, user.email, user.role as UserRole, googleUser.name);
   }
@@ -130,6 +137,7 @@ export class AuthService {
 
   // ─── Issue JWT Access + Refresh Tokens ────────────────────────────────────
   private async issueTokens(userId: string, email: string, role: UserRole, name?: string): Promise<AuthTokens> {
+    this.logger.log(`Issuing tokens for userId: ${userId}`);
     const payload: JwtPayload = { sub: userId, email, role, ...(name ? { name } : {}) };
 
     const accessToken = this.jwt.sign(payload, {
@@ -147,10 +155,15 @@ export class AuthService {
 
     const tokenHash = createHash('sha256').update(refreshTokenValue).digest('hex');
 
-
-    await this.prisma.session.create({
-      data: { userId, tokenHash, expiresAt },
-    });
+    this.logger.log(`Creating session for user: ${userId}`);
+    try {
+      await this.prisma.session.create({
+        data: { userId, tokenHash, expiresAt },
+      });
+    } catch (e) {
+      this.logger.error(`Failed to create session in database: ${e.message}`, e.stack);
+      throw e;
+    }
 
     return { accessToken, refreshToken: refreshTokenValue, expiresIn: 900 };
   }
