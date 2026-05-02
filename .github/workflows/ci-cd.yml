@@ -1,0 +1,296 @@
+name: ELECTRA — CI/CD Production Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      deploy_env:
+        description: 'Deployment environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options: [staging, production]
+
+env:
+  NODE_VERSION: '20.x'
+  PNPM_VERSION: '9'
+
+jobs:
+  # ─────────────────────────────────────────────────────────────────────────────
+  # JOB 1: Code Quality & Type Safety
+  # ─────────────────────────────────────────────────────────────────────────────
+  quality:
+    name: Code Quality
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: TypeScript type check
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Format check
+        run: npx prettier --check "**/*.{ts,tsx,json}"
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # JOB 2: Security Scanning
+  # ─────────────────────────────────────────────────────────────────────────────
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Audit dependencies (high severity)
+        run: npm audit --audit-level=high
+
+      - name: Check for hardcoded secrets (truffleHog)
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          extra_args: --only-verified
+
+      - name: OWASP Dependency Check
+        uses: dependency-check/Dependency-Check_Action@main
+        with:
+          project: 'electra'
+          path: '.'
+          format: 'HTML'
+          args: --failOnCVSS 8
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # JOB 3: Unit + Integration Tests
+  # ─────────────────────────────────────────────────────────────────────────────
+  test:
+    name: Tests
+    runs-on: ubuntu-latest
+    needs: [quality]
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: electra_test
+          POSTGRES_USER: electra_user
+          POSTGRES_PASSWORD: electra_pass
+        ports: ['5432:5432']
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+      redis:
+        image: redis:7-alpine
+        ports: ['6379:6379']
+        options: --health-cmd "redis-cli ping" --health-interval 10s --health-timeout 5s --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://electra_user:electra_pass@localhost:5432/electra_test
+      REDIS_URL: redis://localhost:6379
+      JWT_SECRET: test-secret-key-minimum-32-chars-for-testing
+      JWT_REFRESH_SECRET: test-refresh-secret-minimum-32-chars-test
+      NODE_ENV: test
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: Run database migrations
+        run: npx prisma migrate deploy
+
+      - name: Run unit tests
+        run: npx jest tests/unit --coverage --coverageReporters=lcov,text
+
+      - name: Run integration tests
+        run: npx jest tests/integration --coverage
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage/lcov.info
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # JOB 4: Build Verification
+  # ─────────────────────────────────────────────────────────────────────────────
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: [test, security]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: Build API (NestJS)
+        run: cd apps/api && npm run build
+        env:
+          NODE_ENV: production
+
+      - name: Build Web (Next.js)
+        run: cd apps/web && npm run build
+        env:
+          NODE_ENV: production
+          NEXT_PUBLIC_API_URL: ${{ vars.NEXT_PUBLIC_API_URL }}
+          NEXT_PUBLIC_APP_NAME: ELECTRA
+
+      - name: Upload web build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-build
+          path: apps/web/.next
+          retention-days: 1
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # JOB 5: Lighthouse Performance Check
+  # ─────────────────────────────────────────────────────────────────────────────
+  lighthouse:
+    name: Lighthouse Audit
+    runs-on: ubuntu-latest
+    needs: [build]
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Lighthouse CI
+        uses: treosh/lighthouse-ci-action@v11
+        with:
+          urls: |
+            http://localhost:3000
+            http://localhost:3000/emergency
+          budgetPath: ./lighthouse-budget.json
+          uploadArtifacts: true
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # JOB 6: Deploy to Staging
+  # ─────────────────────────────────────────────────────────────────────────────
+  deploy-staging:
+    name: Deploy Staging
+    runs-on: ubuntu-latest
+    needs: [build]
+    if: github.ref == 'refs/heads/develop' || (github.event_name == 'workflow_dispatch' && inputs.deploy_env == 'staging')
+    environment:
+      name: staging
+      url: https://staging.electra.app
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy API to Railway (staging)
+        uses: railwayapp/railway-deploy@v1
+        with:
+          railway-token: ${{ secrets.RAILWAY_TOKEN_STAGING }}
+          service: electra-api-staging
+          environment: staging
+
+      - name: Deploy Web to Vercel (staging)
+        run: npx vercel deploy --token=${{ secrets.VERCEL_TOKEN }} --scope=${{ secrets.VERCEL_ORG_ID }}
+        env:
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_WEB_PROJECT_ID }}
+
+      - name: Run smoke tests on staging
+        run: |
+          for i in {1..12}; do
+            curl -f https://staging.electra.app/api/v1/countries && break
+            echo "Waiting for Staging API..."
+            sleep 10
+          done
+          for i in {1..12}; do
+            curl -f https://staging.electra.app && break
+            echo "Waiting for Staging Web..."
+            sleep 10
+          done
+          echo "✅ Staging smoke tests passed"
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # JOB 7: Deploy to Production
+  # ─────────────────────────────────────────────────────────────────────────────
+  deploy-production:
+    name: Deploy Production
+    runs-on: ubuntu-latest
+    needs: [deploy-staging]
+    if: github.ref == 'refs/heads/main' || (github.event_name == 'workflow_dispatch' && inputs.deploy_env == 'production')
+    environment:
+      name: production
+      url: https://electra.app
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run Prisma production migrations
+        run: npx prisma migrate deploy
+        env:
+          DATABASE_URL: ${{ secrets.PROD_DATABASE_URL }}
+
+      - name: Deploy API to Railway (production)
+        uses: railwayapp/railway-deploy@v1
+        with:
+          railway-token: ${{ secrets.RAILWAY_TOKEN_PROD }}
+          service: electra-api-production
+          environment: production
+
+      - name: Deploy Web to Vercel (production)
+        run: npx vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }} --scope=${{ secrets.VERCEL_ORG_ID }}
+        env:
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_WEB_PROJECT_ID }}
+
+      - name: Production smoke test
+        run: |
+          for i in {1..15}; do
+            curl -f https://api.electra.app/api/v1/countries && break
+            echo "Waiting for Prod API..."
+            sleep 10
+          done
+          for i in {1..15}; do
+            curl -f https://electra.app && break
+            echo "Waiting for Prod Web..."
+            sleep 10
+          done
+          echo "✅ Production smoke tests passed"
+
+      - name: Notify deployment success
+        run: echo "🚀 ELECTRA deployed to production — Navigate Every Election."

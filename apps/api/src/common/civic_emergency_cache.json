@@ -1,0 +1,157 @@
+{
+  "generatedAt": "2026-05-01T00:00:00.000Z",
+  "version": "2.0.0",
+  "note": "Static emergency fallback — structured for the Emergency UX UI.",
+  "countries": {
+    "IND": {
+      "helpline": "1950",
+      "portalUrl": "voters.eci.gov.in",
+      "scenarios": {
+        "T01": {
+          "title": "My name isn't on the roll",
+          "steps": [
+            "Stay at the polling station. Ask the Presiding Officer to check the SUPPLEMENTARY ROLL.",
+            "Request a TENDER BALLOT. This is your legal right under the Representation of the People Act.",
+            "If denied, call 1950 immediately to report wrongful exclusion."
+          ]
+        },
+        "T02": {
+          "title": "I lost my voter ID (EPIC)",
+          "steps": [
+            "You CAN STILL VOTE. An EPIC card is not mandatory if your name is on the roll.",
+            "Show an alternative ID: Aadhaar Card, PAN Card, Passport, Driving License, or MNREGA Job Card.",
+            "The polling officer will accept any of the 12 approved alternative photo IDs."
+          ]
+        },
+        "T04": {
+          "title": "I'm at the wrong polling booth",
+          "steps": [
+            "Ask the BLO (Booth Level Officer) outside the station for your correct Part Number.",
+            "Or SMS your EPIC number: Type 'ECI <EPIC_Number>' and send to 1950.",
+            "Go to the correct booth — you cannot vote anywhere else in India."
+          ]
+        }
+      }
+    },
+    "USA": {
+      "helpline": "1-866-687-8683",
+      "portalUrl": "vote.gov",
+      "scenarios": {
+        "T01": {
+          "title": "My name isn't on the roll",
+          "steps": [
+            "Ask the poll worker to check the supplemental list or check if you are at the wrong table.",
+            "Demand a PROVISIONAL BALLOT. Under federal law (HAVA), they MUST give you one.",
+            "Do NOT leave the polling place without casting a provisional ballot."
+          ]
+        },
+        "T02": {
+          "title": "I forgot/lost my ID",
+          "steps": [
+            "Rules vary strictly by state. 36 states require some ID. 14 do not.",
+            "If you lack ID, ask to cast a PROVISIONAL BALLOT.",
+            "Call 1-866-OUR-VOTE immediately to confirm your state's exact ID requirement."
+          ]
+        },
+        "T04": {
+          "title": "I'm at the wrong polling booth",
+          "steps": [
+            "Many states will invalidate your provisional ballot if cast in the wrong precinct.",
+            "Call your county election office or 1-866-OUR-VOTE to find your exact assigned precinct.",
+            "Go to the correct precinct before polls close."
+          ]
+        }
+      }
+    },
+    "GBR": {
+      "helpline": "0800 328 0280",
+      "portalUrl": "electoralcommission.org.uk",
+      "scenarios": {
+        "T01": {
+          "title": "My name isn't on the roll",
+          "steps": [
+            "If you registered recently, you might be on an update list. Ask the staff to check all lists.",
+            "If there has been an administrative error, call your local Electoral Registration Office immediately.",
+            "If you are not registered, you cannot vote. You cannot register on election day in the UK."
+          ]
+        },
+        "T02": {
+          "title": "I lost my photo ID",
+          "steps": [
+            "You MUST have an accepted photo ID to vote in person in England, Scotland (UK elections), and Wales (UK elections).",
+            "Expired IDs are accepted as long as the photo still looks like you.",
+            "If you lost your ID on polling day, you can apply for an emergency proxy vote until 5pm."
+          ]
+        },
+        "T04": {
+          "title": "I'm at the wrong polling booth",
+          "steps": [
+            "You can only vote at your assigned polling station.",
+            "Check your polling card or enter your postcode at wheredoivote.co.uk.",
+            "Travel to the correct polling station before 10pm."
+          ]
+        }
+      }
+    },
+    "CAN": {
+      "helpline": "1-800-463-6868",
+      "portalUrl": "elections.ca",
+      "scenarios": {
+        "T01": {
+          "title": "My name isn't on the roll",
+          "steps": [
+            "You can register AT THE POLLING STATION on Election Day.",
+            "Bring accepted ID proving your identity and current address (like a driver's license).",
+            "A poll worker will register you on the spot and allow you to vote."
+          ]
+        },
+        "T02": {
+          "title": "I forgot/lost my ID",
+          "steps": [
+            "You can still vote through VOUCHING.",
+            "Another voter registered in the same polling division can vouch for you.",
+            "The voucher must have valid ID and can only vouch for one person."
+          ]
+        },
+        "T04": {
+          "title": "I'm at the wrong polling booth",
+          "steps": [
+            "You must vote at your assigned polling station for your riding.",
+            "Use the Voter Information Service at elections.ca to find your exact location.",
+            "Go to the correct station. You can register there if needed."
+          ]
+        }
+      }
+    },
+    "AUS": {
+      "helpline": "13 23 26",
+      "portalUrl": "aec.gov.au",
+      "scenarios": {
+        "T01": {
+          "title": "My name isn't on the roll",
+          "steps": [
+            "Ask to cast a DECLARATION VOTE.",
+            "You will fill in your details on a declaration envelope, put your ballot inside, and seal it.",
+            "The AEC will check your eligibility after election day before counting it."
+          ]
+        },
+        "T02": {
+          "title": "I lost my ID",
+          "steps": [
+            "You do NOT need to show photo ID to vote in Australian federal elections.",
+            "You only need to state your full name and address, and confirm you haven't voted yet.",
+            "The polling official will mark your name off the roll."
+          ]
+        },
+        "T04": {
+          "title": "I'm at the wrong polling booth",
+          "steps": [
+            "You can vote at ANY polling place within your home state or territory.",
+            "If you are voting outside your home division (but in the same state), you cast an ABSENT VOTE.",
+            "Just tell the official you are from another division and they will issue the correct ballot."
+          ]
+        }
+      }
+    }
+  }
+}
